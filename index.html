@@ -1,0 +1,465 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#2D4FC4">
+<meta name="description" content="Diário para acompanhar aplicações de tirzepatida, peso, proteína, água e sintomas.">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Tirzepatida">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon-192.png" type="image/png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<title>Diário Tirzepatida</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Figtree:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+:root{
+  --bg:#EEF1EC; --surface:#FAFBF8; --surface-2:#E4E9E2; --line:#D3DAD0;
+  --ink:#16211F; --ink-2:#4B5A55; --ink-3:#7A8883;
+  --accent:#2D4FC4; --accent-ink:#FFFFFF; --accent-soft:#DDE4FA;
+  --protein:#B8701A; --protein-soft:#F4E4CC;
+  --water:#1A7F95; --water-soft:#D2ECF1;
+  --good:#2E7D4F; --warn:#B26A00; --bad:#B3372F; --bad-soft:#F6DCD9;
+  --display:"Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --body:"Figtree", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --mono:"JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  --r:14px;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --bg:#101614; --surface:#18201E; --surface-2:#212B28; --line:#2E3A36;
+    --ink:#E8EEEA; --ink-2:#AAB7B2; --ink-3:#7D8B86;
+    --accent:#8FA6FF; --accent-ink:#0F1733; --accent-soft:#1F2A52;
+    --protein:#E6A24C; --protein-soft:#3A2C18;
+    --water:#5CC3D8; --water-soft:#16343B;
+    --good:#6FCB94; --warn:#E3A948; --bad:#F08A80; --bad-soft:#3D1F1C;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#101614; --surface:#18201E; --surface-2:#212B28; --line:#2E3A36;
+  --ink:#E8EEEA; --ink-2:#AAB7B2; --ink-3:#7D8B86;
+  --accent:#8FA6FF; --accent-ink:#0F1733; --accent-soft:#1F2A52;
+  --protein:#E6A24C; --protein-soft:#3A2C18;
+  --water:#5CC3D8; --water-soft:#16343B;
+  --good:#6FCB94; --warn:#E3A948; --bad:#F08A80; --bad-soft:#3D1F1C;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:15px/1.5 var(--body);padding-inline:16px;padding-block:0 96px}
+.app{max-width:560px;margin:0 auto}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;margin:0}
+.num{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-block:18px 10px}
+.brand{font-family:var(--display);font-size:20px;white-space:nowrap;font-weight:700;letter-spacing:-.01em}
+.brand span{color:var(--accent)}
+.sync{font-size:12px;color:var(--ink-3);display:flex;align-items:center;gap:6px;white-space:nowrap}
+.sync::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--ink-3)}
+.sync.ok::before{background:var(--good)} .sync.saving::before{background:var(--warn)} .sync.err::before{background:var(--bad)}
+main{display:flex;flex-direction:column;gap:14px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px;display:flex;flex-direction:column;gap:12px}
+.label{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);font-weight:600}
+.row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.between{justify-content:space-between}
+.muted{color:var(--ink-2)} .small{font-size:13px}
+.datebar{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.datebar b{font-family:var(--display);font-size:17px}
+button{font:inherit;color:inherit;cursor:pointer}
+.btn{border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:8px 12px;font-weight:600;font-size:14px}
+.btn:hover{background:var(--surface-2)}
+.btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.btn.primary:hover{filter:brightness(1.08)}
+.btn.ghost{border-color:transparent;background:transparent}
+.btn.danger{color:var(--bad)}
+.btn.icon{width:38px;height:38px;padding:0;display:grid;place-items:center;font-size:18px}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+input,select,textarea{font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:9px 11px;min-width:0}
+textarea{width:100%;resize:vertical;min-height:70px}
+.field{display:flex;flex-direction:column;gap:4px;flex:1 1 130px}
+.field span{font-size:12px;color:var(--ink-2);font-weight:500}
+/* dose hero */
+.dose{background:var(--accent);color:var(--accent-ink);border:none}
+.dose .label{color:inherit;opacity:.75}
+.dose .big{font-family:var(--display);font-size:25px;font-weight:700;line-height:1.1}
+.dose .sub{opacity:.85;font-size:14px}
+.dose .btn{background:var(--accent-ink);color:var(--accent);border:none}
+.pill{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:3px 10px;font-size:12px;font-weight:600;background:var(--surface-2);color:var(--ink-2)}
+.dose .pill{background:rgba(255,255,255,.18);color:inherit}
+.pill.warn{background:var(--bad-soft);color:var(--bad)}
+/* meters */
+.meter{height:10px;border-radius:99px;background:var(--surface-2);overflow:hidden}
+.meter i{display:block;height:100%;border-radius:99px;transition:width .3s}
+.m-protein i{background:var(--protein)} .m-water i{background:var(--water)}
+.stat{display:flex;align-items:baseline;gap:6px}
+.stat .v{font-family:var(--mono);font-size:26px;font-weight:500}
+.stat .g{color:var(--ink-3);font-size:14px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:1px solid var(--line);background:var(--bg);border-radius:999px;padding:6px 12px;font-size:13px;font-weight:500}
+.chip.on{background:var(--accent-soft);border-color:var(--accent);color:var(--ink)}
+.chip.food{border-radius:10px;display:flex;flex-direction:column;align-items:flex-start;gap:0;text-align:left;padding:7px 10px}
+.chip.food b{font-family:var(--mono);font-weight:500;color:var(--protein);font-size:13px}
+.foods{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
+.entries{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+.entries li{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:7px 0;border-top:1px dashed var(--line);font-size:14px}
+.entries li .num{color:var(--protein)}
+.water-row .btn{color:var(--water)}
+.alert{background:var(--bad-soft);border-color:transparent;color:var(--ink)}
+.alert b{color:var(--bad)}
+/* stats grid */
+.grid4{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.tile{background:var(--bg);border-radius:10px;padding:10px 12px}
+.tile .v{font-family:var(--mono);font-size:20px}
+.tile .k{font-size:12px;color:var(--ink-3)}
+.chartbox{width:100%;overflow-x:auto}
+svg text{font-family:var(--mono);font-size:11px;fill:var(--ink-3)}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;font-weight:600;color:var(--ink-3);font-size:11px;text-transform:uppercase;letter-spacing:.06em;padding:6px 6px 6px 0}
+td{padding:7px 6px 7px 0;border-top:1px solid var(--line);vertical-align:top}
+td.num{white-space:nowrap}
+.tablebox{overflow-x:auto}
+.empty{color:var(--ink-3);font-size:14px;padding:6px 0}
+.sites{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.sites .chip{border-radius:10px;text-align:left}
+.sites .chip.sug{border-style:dashed;border-color:var(--accent)}
+.doselist li{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center}
+.mg{font-family:var(--mono);background:var(--accent-soft);color:var(--ink);border-radius:8px;padding:2px 8px;font-size:13px}
+nav.tabs{position:fixed;left:0;right:0;bottom:0;background:var(--surface);border-top:1px solid var(--line);display:flex;justify-content:center;padding:6px 8px calc(6px + env(safe-area-inset-bottom,0px))}
+nav.tabs .in{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;width:100%;max-width:560px}
+nav.tabs button{border:none;background:transparent;border-radius:10px;padding:8px 4px;font-size:13px;font-weight:600;color:var(--ink-3);display:flex;flex-direction:column;align-items:center;gap:2px}
+nav.tabs button svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8}
+nav.tabs button[aria-current="page"]{color:var(--accent);background:var(--accent-soft)}
+.toast{position:fixed;left:50%;bottom:84px;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:8px 14px;border-radius:10px;font-size:14px;opacity:0;pointer-events:none;transition:opacity .2s}
+.toast.show{opacity:1}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<style>html,body{margin:0}:root{padding-top:env(safe-area-inset-top,0px)}body{-webkit-tap-highlight-color:transparent}</style>
+</head>
+<body>
+<div class="app">
+  <header class="top">
+    <div class="brand">Diário <span>Tirzepatida</span></div>
+    <div id="sync" class="sync">Carregando…</div>
+  </header>
+  <main id="main"></main>
+</div>
+<nav class="tabs" aria-label="Seções">
+  <div class="in">
+    <button data-v="hoje"><svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 3v4M15 3v4"/></svg>Hoje</button>
+    <button data-v="doses"><svg viewBox="0 0 24 24"><path d="M14 4l6 6M17 7l-9 9-3 1 1-3 9-9M7 17l-3 3"/></svg>Doses</button>
+    <button data-v="progresso"><svg viewBox="0 0 24 24"><path d="M4 19h16M6 15l4-4 3 3 5-6"/></svg>Progresso</button>
+    <button data-v="ajustes"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1"/></svg>Ajustes</button>
+  </div>
+</nav>
+<div id="toast" class="toast" role="status"></div>
+
+<script>
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const pad=n=>String(n).padStart(2,'0');
+const iso=d=>d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
+const parse=s=>{const [y,m,d]=s.split('-').map(Number);return new Date(y,m-1,d);};
+const today=()=>iso(new Date());
+const addDays=(s,n)=>{const d=parse(s);d.setDate(d.getDate()+n);return iso(d);};
+const diffDays=(a,b)=>Math.round((parse(b)-parse(a))/864e5);
+const fmtDate=(s,o={day:'2-digit',month:'short'})=>parse(s).toLocaleDateString('pt-BR',o).replace('.','');
+const fmtN=(n,d=1)=>Number(n).toLocaleString('pt-BR',{minimumFractionDigits:d,maximumFractionDigits:d});
+const numIn=v=>{if(v===''||v==null)return null;const n=parseFloat(String(v).replace(',','.'));return isFinite(n)?n:null;};
+
+const DEFAULT_CFG={startWeight:null,goalWeight:null,height:null,proteinGoal:155,waterGoal:2500};
+const DOSES=[2.5,5,7.5,10,12.5,15];
+const SITES=['Abdômen esquerdo','Abdômen direito','Coxa esquerda','Coxa direita','Braço esquerdo','Braço direito'];
+const SYMPTOMS=['Náusea','Vômito','Refluxo','Constipação','Diarreia','Fadiga','Sem apetite','Dor de cabeça','Tontura'];
+const FOODS=[{n:'Frango grelhado 100 g',p:31},{n:'Ovo inteiro',p:6},{n:'Whey 1 scoop (30 g)',p:24},{n:'Patinho moído 100 g',p:27},{n:'Tilápia 100 g',p:26},{n:'Iogurte proteico',p:15},{n:'Cottage 100 g',p:11},{n:'Feijão 1 concha',p:7}];
+
+let S={cfg:{...DEFAULT_CFG},doses:[],days:{}};
+let store=null, view='hoje', selDate=today(), pendingRender=false, armed=null;
+
+/* ---------- storage ---------- */
+function setSync(st){const el=$('#sync');el.className='sync '+st;
+  el.textContent=st==='ok'?(store&&store.kind==='db'?'Salvo':'Salvo neste aparelho'):st==='saving'?'Salvando…':st==='err'?'Erro ao salvar':'Carregando…';}
+function localStore(){
+  const K='diario-tirzepatida-v1';
+  const persist=()=>{try{localStorage.setItem(K,JSON.stringify(S));setSync('ok');}catch(e){setSync('err');}};
+  return {kind:'local',
+    start(){try{const raw=localStorage.getItem(K);if(raw){const o=JSON.parse(raw);S={cfg:{...DEFAULT_CFG,...o.cfg},doses:o.doses||[],days:o.days||{}};}}catch(e){}return Promise.resolve();},
+    saveCfg:persist,saveDay:persist,saveDose:persist,delDose:persist};
+}
+async function initStore(){
+  store=localStore();
+  await store.start();setSync('ok');
+  try{if(navigator.storage&&navigator.storage.persist)navigator.storage.persist();}catch(e){}
+}
+function saveAll(){try{localStorage.setItem('diario-tirzepatida-v1',JSON.stringify(S));}catch(e){}}
+function download(filename,text,type){
+  const blob=new Blob([text],{type});
+  let file=null;try{file=new File([blob],filename,{type});}catch(e){}
+  if(file&&navigator.canShare&&navigator.canShare({files:[file]})&&/Android|iPhone|iPad/i.test(navigator.userAgent)){
+    navigator.share({files:[file],title:filename}).catch(()=>{});return;}
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=filename;document.body.appendChild(a);a.click();
+  setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},1000);
+}
+function exportBackup(){
+  const data=JSON.stringify({app:'diario-tirzepatida',versao:1,exportadoEm:new Date().toISOString(),dados:S});
+  download('backup-diario-tirzepatida-'+today()+'.json',data,'application/json');
+  try{localStorage.setItem('diario-ultimo-backup',today());}catch(e){}
+  toast('Backup gerado');render();
+}
+function importBackup(file){
+  const r=new FileReader();
+  r.onload=()=>{try{const o=JSON.parse(r.result);const d=o.dados||o;
+    if(!d||typeof d!=='object'||!('days' in d)){toast('Arquivo não reconhecido.');return;}
+    S={cfg:{...DEFAULT_CFG,...(d.cfg||{})},doses:d.doses||[],days:d.days||{}};saveAll();render();toast('Backup restaurado');
+  }catch(e){toast('Arquivo inválido.');}};
+  r.readAsText(file);
+}
+
+/* ---------- helpers ---------- */
+function day(date){return S.days[date]||{};}
+function dayMut(date){const d=JSON.parse(JSON.stringify(S.days[date]||{}));S.days={...S.days,[date]:d};return d;}
+function proteinOf(d){return (d.meals||[]).reduce((s,m)=>s+(+m.p||0),0);}
+function weights(){return Object.keys(S.days).filter(k=>S.days[k].weight!=null).sort().map(k=>({date:k,w:+S.days[k].weight}));}
+function lastDose(){return S.doses[0]||null;}
+function toast(msg){const t=$('#toast');t.textContent=msg;t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),2200);}
+function weeksAtDose(){const ds=S.doses;if(!ds.length)return 0;const mg=ds[0].mg;let first=ds[0].date;for(const d of ds){if(d.mg!==mg)break;first=d.date;}return Math.floor(diffDays(first,today())/7)+1;}
+function nextSite(){const l=lastDose();if(!l)return SITES[0];const i=SITES.indexOf(l.site);return SITES[(i+1)%SITES.length];}
+function isTyping(){const a=document.activeElement;return a&&$('#main').contains(a)&&/^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName);}
+
+/* ---------- render ---------- */
+function render(){
+  if(isTyping()){pendingRender=true;return;}
+  pendingRender=false;
+  document.querySelectorAll('nav.tabs button').forEach(b=>{if(b.dataset.v===view)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current');});
+  $('#main').innerHTML=({hoje:vHoje,doses:vDoses,progresso:vProg,ajustes:vAjustes})[view]();
+  if(view==='progresso')drawChart();
+}
+
+function doseCard(){
+  const l=lastDose();
+  if(!l)return `<section class="card dose"><div class="label">Aplicação semanal</div>
+    <div class="big">Nenhuma aplicação registrada</div><div class="sub">Registre a primeira para acompanhar o dia da próxima dose e o rodízio dos locais.</div>
+    <div><button class="btn" data-go="doses">Registrar aplicação</button></div></section>`;
+  const next=addDays(l.date,7),dd=diffDays(today(),next);
+  const when=dd>1?`em ${dd} dias`:dd===1?'amanhã':dd===0?'hoje':`atrasada ${-dd} dia${dd===-1?'':'s'}`;
+  const wk=weeksAtDose();
+  return `<section class="card dose"><div class="row between"><div class="label">Próxima aplicação</div><span class="pill">${fmtN(l.mg,l.mg%1?1:0)} mg · semana ${wk}</span></div>
+    <div class="big">${dd===0?'Hoje é dia de aplicar':'Aplicar '+when}</div>
+    <div class="sub">${esc(fmtDate(next,{weekday:'long',day:'2-digit',month:'long'}))} · local sugerido: ${esc(nextSite())}</div>
+    ${dd<=0?'<div><button class="btn" data-go="doses">Registrar aplicação</button></div>':''}</section>`;
+}
+
+function vHoje(){
+  const d=day(selDate),isToday=selDate===today();
+  const pr=proteinOf(d),pg=S.cfg.proteinGoal||155,wa=d.water||0,wg=S.cfg.waterGoal||2500;
+  const ws=weights().filter(x=>x.date<selDate),prev=ws.length?ws[ws.length-1]:null;
+  const delta=d.weight!=null&&prev?d.weight-prev.w:null;
+  return `
+  <div class="datebar"><button class="btn icon ghost" data-day="-1" aria-label="Dia anterior">‹</button>
+    <b>${isToday?'Hoje, ':''}${esc(fmtDate(selDate,{weekday:isToday?undefined:'short',day:'2-digit',month:'long'}))}</b>
+    <button class="btn icon ghost" data-day="1" aria-label="Próximo dia" ${isToday?'disabled style="opacity:.3"':''}>›</button></div>
+  ${isToday?doseCard():''}
+  ${isToday&&backupDue()?'<section class="card small row between"><span>Faz mais de 7 dias sem backup.</span><button class="btn" id="backup">Fazer backup</button></section>':''}
+  <section class="card">
+    <div class="row between"><div class="label">Proteína</div><span class="small muted">meta ${pg} g</span></div>
+    <div class="stat"><span class="v" style="color:var(--protein)">${pr}</span><span class="g">/ ${pg} g · faltam ${Math.max(0,pg-pr)} g</span></div>
+    <div class="meter m-protein"><i style="width:${Math.min(100,pr/pg*100)}%"></i></div>
+    <div class="foods">${FOODS.map((f,i)=>`<button class="chip food" data-food="${i}">${esc(f.n)}<b>+${f.p} g</b></button>`).join('')}</div>
+    <form class="row" id="f-food">
+      <input id="food-name" placeholder="Outro alimento" style="flex:2 1 140px" aria-label="Nome do alimento">
+      <input id="food-p" inputmode="decimal" placeholder="g prot." style="flex:1 1 70px;width:80px" aria-label="Gramas de proteína">
+      <button class="btn primary" type="submit">Adicionar</button></form>
+    ${(d.meals||[]).length?`<ul class="entries">${d.meals.map((m,i)=>`<li><span>${esc(m.n)}</span><span class="row"><span class="num">${fmtN(m.p,m.p%1?1:0)} g</span><button class="btn ghost small" data-delmeal="${i}" aria-label="Remover">✕</button></span></li>`).join('')}</ul>`:'<div class="empty">Toque num alimento para somar a proteína do dia.</div>'}
+  </section>
+  <section class="card">
+    <div class="row between"><div class="label">Água</div><span class="small muted">meta ${fmtN(wg/1000)} L</span></div>
+    <div class="stat"><span class="v" style="color:var(--water)">${fmtN(wa/1000,2)}</span><span class="g">/ ${fmtN(wg/1000)} L</span></div>
+    <div class="meter m-water"><i style="width:${Math.min(100,wa/wg*100)}%"></i></div>
+    <div class="row water-row"><button class="btn" data-water="200">+200 ml</button><button class="btn" data-water="300">+300 ml</button><button class="btn" data-water="500">+500 ml</button><button class="btn ghost" data-water="-200">−200</button></div>
+  </section>
+  <section class="card">
+    <div class="label">Peso em jejum</div>
+    <div class="row"><input id="weight" inputmode="decimal" placeholder="ex.: 98,4" value="${d.weight!=null?fmtN(d.weight):''}" style="width:120px" aria-label="Peso em kg"><span class="muted">kg</span>
+    ${delta!=null?`<span class="pill" style="color:${delta<=0?'var(--good)':'var(--warn)'}">${delta>0?'+':''}${fmtN(delta)} kg desde ${esc(fmtDate(prev.date))}</span>`:''}</div>
+  </section>
+  <section class="card">
+    <div class="label">Como você está</div>
+    <div class="chips">${SYMPTOMS.map(s=>`<button class="chip ${(d.symptoms||[]).includes(s)?'on':''}" data-sym="${esc(s)}" aria-pressed="${(d.symptoms||[]).includes(s)}">${esc(s)}</button>`).join('')}</div>
+    <textarea id="notes" placeholder="Observações: fome, sono, treino, refeições que caíram mal…" aria-label="Observações">${esc(d.notes||'')}</textarea>
+  </section>
+  <section class="card alert small"><div><b>Procure atendimento</b> se tiver dor abdominal forte e contínua (pode irradiar para as costas), vômitos que não param, sinais de desidratação ou pele e olhos amarelados.</div></section>`;
+}
+
+function vDoses(){
+  const l=lastDose(),defMg=l?l.mg:2.5,sug=nextSite(),wk=weeksAtDose();
+  const hint=l&&wk>=5&&l.mg<15?`<div class="pill warn">${wk} semanas em ${fmtN(l.mg,l.mg%1?1:0)} mg. Converse com seu médico sobre o ajuste de dose.</div>`:'';
+  return `
+  <section class="card">
+    <h2 style="font-size:20px">Registrar aplicação</h2>
+    <form id="f-dose" class="card" style="padding:0;border:none;background:none;gap:12px">
+      <div class="row">
+        <label class="field"><span>Data</span><input type="date" id="dose-date" value="${today()}" max="${today()}"></label>
+        <label class="field"><span>Dose</span><select id="dose-mg">${DOSES.map(m=>`<option value="${m}" ${m===defMg?'selected':''}>${fmtN(m,m%1?1:0)} mg</option>`).join('')}</select></label>
+      </div>
+      <div class="field"><span>Local da aplicação (tracejado = próximo no rodízio)</span>
+        <div class="sites" id="sites">${SITES.map(s=>`<button type="button" class="chip ${s===sug?'on sug':''}" data-site="${esc(s)}">${esc(s)}</button>`).join('')}</div></div>
+      <label class="field"><span>Observações</span><input id="dose-notes" placeholder="ex.: caneta nova, lote, horário"></label>
+      <div><button class="btn primary" type="submit">Salvar aplicação</button></div>
+    </form>
+    ${hint}
+  </section>
+  <section class="card">
+    <div class="row between"><div class="label">Histórico</div><span class="small muted">${S.doses.length} aplicaç${S.doses.length===1?'ão':'ões'}</span></div>
+    ${S.doses.length?`<ul class="entries doselist">${S.doses.map(x=>`<li><span class="mg">${fmtN(x.mg,x.mg%1?1:0)} mg</span>
+      <span><b>${esc(fmtDate(x.date,{weekday:'short',day:'2-digit',month:'short'}))}</b> <span class="muted small">· ${esc(x.site||'')}</span>${x.notes?`<br><span class="small muted">${esc(x.notes)}</span>`:''}</span>
+      <button class="btn ghost small ${armed===x.id?'danger':''}" data-deldose="${esc(x.id)}">${armed===x.id?'Confirmar':'Excluir'}</button></li>`).join('')}</ul>`:'<div class="empty">Nenhuma aplicação ainda.</div>'}
+  </section>
+  <section class="card small muted">Tirzepatida é aplicada uma vez por semana, no mesmo dia. A titulação usual sobe 2,5 mg a cada 4 semanas no mínimo, até a dose de manutenção definida pelo médico. Se esquecer, siga a orientação da bula ou do seu médico sobre o prazo para aplicar a dose atrasada.</section>`;
+}
+
+function vProg(){
+  const ws=weights(),c=S.cfg,cur=ws.length?ws[ws.length-1].w:null;
+  const start=c.startWeight!=null?c.startWeight:(ws.length?ws[0].w:null);
+  const lost=cur!=null&&start!=null?start-cur:null;
+  const toGoal=cur!=null&&c.goalWeight!=null?cur-c.goalWeight:null;
+  const imc=cur!=null&&c.height?cur/Math.pow(c.height/100,2):null;
+  const keys=Object.keys(S.days).sort().reverse().slice(0,21);
+  // weekly avg protein (last 7 days with data)
+  const last7=[...Array(7)].map((_,i)=>addDays(today(),-i)).map(k=>S.days[k]).filter(Boolean);
+  const avgP=last7.length?Math.round(last7.reduce((s,d)=>s+proteinOf(d),0)/last7.length):null;
+  return `
+  <section class="card">
+    <div class="label">Resumo</div>
+    <div class="grid4">
+      <div class="tile"><div class="v num">${cur!=null?fmtN(cur):'—'}</div><div class="k">peso atual (kg)</div></div>
+      <div class="tile"><div class="v num" style="color:var(--good)">${lost!=null?(lost>=0?'−':'+')+fmtN(Math.abs(lost)):'—'}</div><div class="k">desde o início (kg)</div></div>
+      <div class="tile"><div class="v num">${toGoal!=null?fmtN(Math.max(0,toGoal)):'—'}</div><div class="k">até a meta (kg)</div></div>
+      <div class="tile"><div class="v num">${imc?fmtN(imc):(avgP!=null?avgP+' g':'—')}</div><div class="k">${imc?'IMC':'proteína média 7 dias'}</div></div>
+    </div>
+  </section>
+  <section class="card">
+    <div class="row between"><div class="label">Peso</div>${c.goalWeight!=null?`<span class="small muted">meta ${fmtN(c.goalWeight)} kg (tracejado)</span>`:''}</div>
+    <div class="chartbox" id="chart"></div>
+  </section>
+  <section class="card">
+    <div class="row between"><div class="label">Últimos dias</div><button class="btn" id="export">Exportar CSV</button></div>
+    ${keys.length?`<div class="tablebox"><table><thead><tr><th>Dia</th><th>Peso</th><th>Prot.</th><th>Água</th><th>Sintomas</th></tr></thead><tbody>
+      ${keys.map(k=>{const d=S.days[k],p=proteinOf(d);return `<tr><td class="num">${esc(fmtDate(k))}</td><td class="num">${d.weight!=null?fmtN(d.weight):'—'}</td>
+      <td class="num" style="color:${p>=(c.proteinGoal||155)?'var(--good)':'inherit'}">${p?p+' g':'—'}</td><td class="num">${d.water?fmtN(d.water/1000)+' L':'—'}</td><td>${esc((d.symptoms||[]).join(', '))||'—'}</td></tr>`;}).join('')}
+    </tbody></table></div>`:'<div class="empty">Os dias registrados aparecem aqui.</div>'}
+    <div class="small muted">O CSV reúne diário e aplicações. Leve para a consulta ou abra no Excel. Para guardar seus dados, use o backup em Ajustes.</div>
+  </section>`;
+}
+
+function drawChart(){
+  const box=$('#chart');if(!box)return;
+  const ws=weights().slice(-120);
+  if(ws.length<2){box.innerHTML='<div class="empty">Registre o peso em pelo menos dois dias para ver a curva.</div>';return;}
+  const W=600,H=230,L=42,R=14,T=14,B=28;
+  const g=S.cfg.goalWeight;
+  let lo=Math.min(...ws.map(x=>x.w)),hi=Math.max(...ws.map(x=>x.w));
+  if(g!=null&&g>=lo-6)lo=Math.min(lo,g);
+  lo=Math.floor(lo-0.5);hi=Math.ceil(hi+0.5);if(hi-lo<4)hi=lo+4;
+  const span=diffDays(ws[0].date,ws[ws.length-1].date)||1;
+  const x=d=>L+(W-L-R)*diffDays(ws[0].date,d)/span;
+  const y=v=>T+(H-T-B)*(hi-v)/(hi-lo);
+  const step=Math.max(1,Math.ceil((hi-lo)/4));
+  let grid='';for(let v=lo;v<=hi;v+=step){grid+=`<line x1="${L}" x2="${W-R}" y1="${y(v)}" y2="${y(v)}" stroke="var(--line)"/><text x="${L-8}" y="${y(v)+4}" text-anchor="end">${v}</text>`;}
+  const pts=ws.map(p=>[x(p.date),y(p.w)]);
+  const path=pts.map((p,i)=>(i?'L':'M')+p[0].toFixed(1)+' '+p[1].toFixed(1)).join(' ');
+  const area=path+` L${pts[pts.length-1][0].toFixed(1)} ${H-B} L${pts[0][0].toFixed(1)} ${H-B} Z`;
+  const goal=g!=null&&g>=lo&&g<=hi?`<line x1="${L}" x2="${W-R}" y1="${y(g)}" y2="${y(g)}" stroke="var(--good)" stroke-dasharray="5 5"/>`:'';
+  const doseMarks=S.doses.filter(d=>d.date>=ws[0].date&&d.date<=ws[ws.length-1].date).map(d=>`<line x1="${x(d.date)}" x2="${x(d.date)}" y1="${H-B}" y2="${H-B+5}" stroke="var(--accent)" stroke-width="2"/>`).join('');
+  const lp=pts[pts.length-1];
+  box.innerHTML=`<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Evolução do peso">
+    ${grid}${goal}
+    <path d="${area}" fill="var(--accent)" fill-opacity=".10"/>
+    <path d="${path}" fill="none" stroke="var(--accent)" stroke-width="2.2" stroke-linejoin="round"/>
+    ${doseMarks}
+    <circle cx="${lp[0]}" cy="${lp[1]}" r="4.5" fill="var(--accent)" stroke="var(--surface)" stroke-width="2"/>
+    <text x="${L}" y="${H-6}">${esc(fmtDate(ws[0].date))}</text>
+    <text x="${W-R}" y="${H-6}" text-anchor="end">${esc(fmtDate(ws[ws.length-1].date))}</text>
+  </svg><div class="small muted">Marcas azuis no eixo = aplicações.</div>`;
+}
+
+function backupDue(){if(!Object.keys(S.days).length&&!S.doses.length)return false;try{const v=localStorage.getItem('diario-ultimo-backup');return !v||diffDays(v,today())>7;}catch(e){return false;}}
+function lastBackup(){try{const v=localStorage.getItem('diario-ultimo-backup');return v?fmtDate(v,{day:'2-digit',month:'long',year:'numeric'}):'nunca';}catch(e){return 'nunca';}}
+function vAjustes(){
+  const c=S.cfg,v=n=>n!=null?fmtN(n,n%1?1:0):'';
+  return `
+  <section class="card">
+    <h2 style="font-size:20px">Suas metas</h2>
+    <div class="row">
+      <label class="field"><span>Peso inicial (kg)</span><input id="c-startWeight" inputmode="decimal" value="${v(c.startWeight)}"></label>
+      <label class="field"><span>Peso meta (kg)</span><input id="c-goalWeight" inputmode="decimal" value="${v(c.goalWeight)}"></label>
+    </div>
+    <div class="row">
+      <label class="field"><span>Altura (cm)</span><input id="c-height" inputmode="decimal" value="${v(c.height)}"></label>
+      <label class="field"><span>Proteína por dia (g)</span><input id="c-proteinGoal" inputmode="decimal" value="${v(c.proteinGoal)}"></label>
+      <label class="field"><span>Água por dia (ml)</span><input id="c-waterGoal" inputmode="decimal" value="${v(c.waterGoal)}"></label>
+    </div>
+    <div class="small muted">As alterações são salvas ao sair do campo. Com a tirzepatida o apetite cai bastante, e bater a proteína ajuda a preservar massa muscular durante a perda de peso.</div>
+  </section>
+  <section class="card">
+    <h2 style="font-size:20px">Backup</h2>
+    <div class="small muted">Seus registros ficam só neste aparelho. Faça um backup toda semana e guarde no Google Drive, e-mail ou WhatsApp. Para trocar de celular, restaure o arquivo no aparelho novo.</div>
+    <div class="small">Último backup: <b>${esc(lastBackup())}</b></div>
+    <div class="row"><button class="btn primary" id="backup">Fazer backup</button>
+    <label class="btn" for="restore" style="cursor:pointer">Restaurar backup</label>
+    <input type="file" id="restore" accept="application/json,.json" hidden></div>
+  </section>`;
+}
+
+/* ---------- events ---------- */
+document.querySelector('nav.tabs').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;view=b.dataset.v;armed=null;if(view==='hoje')selDate=today();render();window.scrollTo(0,0);});
+$('#main').addEventListener('focusout',()=>setTimeout(()=>{if(pendingRender&&!isTyping())render();},0));
+$('#main').addEventListener('click',e=>{
+  const t=e.target.closest('button');if(!t)return;
+  if(t.dataset.go){view=t.dataset.go;render();window.scrollTo(0,0);return;}
+  if(t.dataset.day){const n=addDays(selDate,+t.dataset.day);if(n<=today()){selDate=n;render();}return;}
+  if(t.dataset.food!=null){const f=FOODS[+t.dataset.food],d=dayMut(selDate);(d.meals=d.meals||[]).push({n:f.n,p:f.p});store.saveDay(selDate);render();return;}
+  if(t.dataset.delmeal!=null){const d=dayMut(selDate);d.meals.splice(+t.dataset.delmeal,1);store.saveDay(selDate);render();return;}
+  if(t.dataset.water){const d=dayMut(selDate);d.water=Math.max(0,(d.water||0)+ +t.dataset.water);store.saveDay(selDate);render();return;}
+  if(t.dataset.sym){const d=dayMut(selDate),s=t.dataset.sym;d.symptoms=d.symptoms||[];const i=d.symptoms.indexOf(s);i>=0?d.symptoms.splice(i,1):d.symptoms.push(s);store.saveDay(selDate);render();return;}
+  if(t.dataset.site){document.querySelectorAll('#sites .chip').forEach(c=>c.classList.toggle('on',c===t));return;}
+  if(t.dataset.deldose){const id=t.dataset.deldose;if(armed!==id){armed=id;render();return;}armed=null;S.doses=S.doses.filter(x=>x.id!==id);store.delDose(id);render();toast('Aplicação excluída');return;}
+  if(t.id==='export'){exportCSV();return;}
+  if(t.id==='backup'){exportBackup();return;}
+});
+$('#main').addEventListener('submit',e=>{
+  e.preventDefault();
+  if(e.target.id==='f-food'){const n=$('#food-name').value.trim()||'Alimento',p=numIn($('#food-p').value);if(p==null||p<=0){toast('Informe os gramas de proteína.');return;}
+    const d=dayMut(selDate);(d.meals=d.meals||[]).push({n,p});store.saveDay(selDate);document.activeElement.blur();render();}
+  if(e.target.id==='f-dose'){const site=(document.querySelector('#sites .chip.on')||{}).dataset?.site||nextSite();
+    const rec={id:'d'+Date.now().toString(36),date:$('#dose-date').value||today(),mg:+$('#dose-mg').value,site,notes:$('#dose-notes').value.trim()};
+    S.doses=[rec,...S.doses].sort((x,y)=>x.date<y.date?1:x.date>y.date?-1:0);store.saveDose(rec);document.activeElement.blur();render();toast('Aplicação registrada');}
+});
+$('#main').addEventListener('change',e=>{
+  const t=e.target;
+  if(t.id==='restore'){if(t.files[0])importBackup(t.files[0]);t.value='';return;}
+  if(t.id==='weight'){const d=dayMut(selDate),w=numIn(t.value);if(w==null)delete d.weight;else d.weight=w;store.saveDay(selDate);}
+  else if(t.id==='notes'){const d=dayMut(selDate);d.notes=t.value;store.saveDay(selDate);}
+  else if(t.id&&t.id.startsWith('c-')){S.cfg={...S.cfg,[t.id.slice(2)]:numIn(t.value)};store.saveCfg();}
+  else return;
+  pendingRender=true;
+});
+
+async function exportCSV(){
+  const q=s=>'"'+String(s??'').replace(/"/g,'""')+'"';
+  const rows=['data;peso_kg;proteina_g;agua_ml;sintomas;observacoes'];
+  Object.keys(S.days).sort().forEach(k=>{const d=S.days[k];rows.push([k,d.weight!=null?fmtN(d.weight):'',proteinOf(d)||'',d.water||'',q((d.symptoms||[]).join(', ')),q(d.notes)].join(';'));});
+  rows.push('','aplicacao_data;dose_mg;local;observacoes');
+  [...S.doses].reverse().forEach(x=>rows.push([x.date,fmtN(x.mg,x.mg%1?1:0),q(x.site),q(x.notes)].join(';')));
+  download('diario-tirzepatida-'+today()+'.csv','\ufeff'+rows.join('\r\n'),'text/csv');
+}
+
+render();
+initStore().then(render);
+if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));}
+</script>
+
+</body>
+</html>
