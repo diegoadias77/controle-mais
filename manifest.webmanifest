@@ -1,7 +1,7 @@
 {
-  "name": "D- · diário de menos calorias",
-  "short_name": "D-",
-  "description": "Diário de menos calorias: refeições por foto, água, peso e aplicações semanais.",
+  "name": "Controle+ · viva melhor",
+  "short_name": "Controle+",
+  "description": "Viva melhor: refeições por foto, calorias, água, peso e aplicações semanais.",
   "lang": "pt-BR",
   "start_url": "./",
   "scope": "./",

@@ -1,7 +1,7 @@
-// D- — funciona offline.
+// Controle+ — funciona offline.
 // Ao alterar index.html, troque a versão abaixo para o celular baixar a nova.
-const VERSION = 'v6';
-const CACHE = 'diario-tirzepatida-' + VERSION;
+const VERSION = 'v8';
+const CACHE = 'controle-mais-' + VERSION;
 const FILES = ['./', './index.html', './manifest.webmanifest',
   './icons/icon-192.png', './icons/icon-512.png', './icons/icon-maskable-512.png', './icons/apple-touch-icon.png'];
 
@@ -10,7 +10,7 @@ self.addEventListener('install', e => {
 });
 self.addEventListener('activate', e => {
   e.waitUntil(caches.keys().then(keys => Promise.all(
-    keys.filter(k => k.startsWith('diario-tirzepatida-') && k !== CACHE).map(k => caches.delete(k))
+    keys.filter(k => k.startsWith('controle-mais-') && k !== CACHE).map(k => caches.delete(k))
   )).then(() => self.clients.claim()));
 });
 self.addEventListener('fetch', e => {
