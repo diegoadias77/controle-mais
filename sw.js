@@ -1,6 +1,6 @@
-// Diário Tirzepatida — funciona offline.
+// D- — funciona offline.
 // Ao alterar index.html, troque a versão abaixo para o celular baixar a nova.
-const VERSION = 'v1';
+const VERSION = 'v6';
 const CACHE = 'diario-tirzepatida-' + VERSION;
 const FILES = ['./', './index.html', './manifest.webmanifest',
   './icons/icon-192.png', './icons/icon-512.png', './icons/icon-maskable-512.png', './icons/apple-touch-icon.png'];

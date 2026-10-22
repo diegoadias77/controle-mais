@@ -1,4 +1,4 @@
-# Diário Tirzepatida: como publicar e instalar
+# D- (diário de menos calorias): como publicar e instalar
 
 ## O que tem na pasta
 
@@ -43,12 +43,32 @@ Os dados ficam **só no aparelho**. Se você desinstalar o app, limpar os dados 
 Quando eu enviar uma nova versão do `index.html`:
 
 1. Substitua o arquivo no GitHub (**Add file → Upload files**).
-2. No `sw.js`, troque `const VERSION = 'v1'` por `'v2'` (depois `'v3'`, e assim por diante).
+2. No `sw.js`, aumente o número em `const VERSION = 'v6'` (para `'v7'`, depois `'v8'`, e assim por diante). Os arquivos que eu envio já vêm com a versão trocada.
 3. Feche e abra o app duas vezes para ele pegar a versão nova.
 
 Os seus registros não são afetados pela atualização.
 
-## 5. Personalizar
+## 5. Foto do prato (chave de API)
+
+1. Crie uma conta em **console.anthropic.com**.
+2. Em **Billing**, adicione créditos (mínimo de US$ 5).
+3. Em **Settings → Limits**, defina um limite de gasto mensal.
+4. Em **API keys → Create key**, crie a chave e copie-a.
+5. No app, vá em **Ajustes → Foto do prato (IA)**, cole a chave e toque em **Salvar chave**. O app testa a chave sozinho.
+
+A chave fica só no aparelho e não entra no backup. Cadastre a chave em cada aparelho onde for usar a foto.
+
+## 6. Lembretes (água, refeições, peso e aplicação)
+
+1. No app, vá em **Ajustes → Lembretes**, ajuste os horários e toque em **Baixar arquivo de lembretes**.
+2. **Android:** no computador, abra **calendar.google.com** → Configurações → **Criar nova agenda** chamada *D-* → em *Notificações de eventos*, coloque **Notificação, 0 minutos** → **Importar e exportar** → escolha o arquivo e a agenda *D-*.
+3. **iPhone:** abra o arquivo no celular e toque em **Adicionar todos**.
+
+Os avisos chegam pelo Google Agenda ou pelo Calendário, mesmo com o app fechado. Cada aviso traz um link que abre o app direto na parte certa (água, refeições, peso ou doses).
+
+Para mudar os horários: exclua a agenda *D-*, crie de novo e importe o arquivo novo.
+
+## 7. Personalizar
 
 No `index.html`, procure estas linhas:
 
@@ -56,6 +76,6 @@ No `index.html`, procure estas linhas:
 - `const SYMPTOMS=[...]`: a lista de sintomas.
 - `const DEFAULT_CFG={...}`: as metas iniciais de proteína (g) e água (ml).
 
-## Próximo passo opcional: APK para Android
+## 8. Próximo passo opcional: APK para Android
 
 Com o app publicado, entre em **pwabuilder.com**, cole o endereço e escolha **Package for stores → Android**. O site gera um APK que você pode instalar direto no celular.
